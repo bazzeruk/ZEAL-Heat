@@ -32,6 +32,9 @@ LEARNING_EVIDENCE_THRESHOLD = 3
 LEARNING_TEMPERATURE_TOLERANCE = 0.5
 LEARNING_TIMING_WINDOW_MINUTES = 30
 
+OCCUPANCY_STORAGE_VERSION = 1
+OCCUPANCY_STORAGE_KEY_FMT = f"{DOMAIN}.occupancy.{{entry_id}}"
+
 THERMAL_STORAGE_VERSION = 1
 THERMAL_DATA_VERSION = 1
 THERMAL_MODEL_STORAGE_KEY_FMT = f"{DOMAIN}.thermal.models.{{entry_id}}"
@@ -120,6 +123,15 @@ ROOM_OPENING_SENSORS = "opening_sensors"
 # the `active` flag in the old ashp_rooms.json (e.g. an unoccupied guest
 # room, or a room like Ensuite/Bathroom that was permanently disabled).
 ROOM_ACTIVE = "active"
+# Optional per-room occupancy setback. This is deliberately separate from
+# ROOM_ACTIVE: an unoccupied room remains part of ZEAL and can request heat to
+# maintain its configured setback temperature.
+ROOM_OCCUPANCY_ENABLED = "occupancy_enabled"
+ROOM_UNOCCUPIED_TEMPERATURE = "unoccupied_temperature"
+ROOM_OCCUPANCY_SOURCE = "occupancy_source"
+ROOM_OCCUPANCY_CALENDAR = "occupancy_calendar"
+OCCUPANCY_SOURCE_MANUAL = "manual"
+OCCUPANCY_SOURCE_CALENDAR = "calendar"
 
 # --- Milestone 2: Coordinator ---------------------------------------------
 # ashp_controller.py's own changelog: hysteresis was removed in favour of a
