@@ -2828,7 +2828,7 @@ class ZealPanel extends HTMLElement {
       .summary-card ha-icon { color:var(--primary-color); --mdc-icon-size:30px; }
       .summary-card strong { display:block; font-size:26px; line-height:1; }
       .summary-card span { display:block; margin-top:5px; color:var(--secondary-text-color); }
-      .zone-grid { display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:16px; }
+      .zone-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 560px), 1fr)); gap:16px; }
       .zone-card { padding:18px; }
       .zone-title, .setup-zone-title, .room-editor-title, .rooms-heading { display:flex; align-items:flex-start; justify-content:space-between; gap:14px; }
       .zone-title h3, .setup-zone-title h3, .room-editor-title h4, .rooms-heading h4 { margin-bottom:4px; }
