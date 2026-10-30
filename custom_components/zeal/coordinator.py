@@ -74,6 +74,7 @@ from .const import (
     ZONE_ROOMS,
     ZONE_SWITCH,
 )
+from .trv_external_temperature import TrvExternalTemperature
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -193,6 +194,9 @@ class ZealCoordinator(DataUpdateCoordinator[dict[str, ZoneStatus]]):
         # read this immutable snapshot rather than reconstructing historical
         # demand from temperature and setpoint after the fact.
         self._room_demand_statuses: dict[str, RoomDemandStatus] = {}
+
+        # Supported TRVs regulate on the room's sensor reading, not their own.
+        self.trv_external_temperature = TrvExternalTemperature(hass)
 
         self._unsub_state_listener: Callable[[], None] | None = None
 
@@ -446,6 +450,7 @@ class ZealCoordinator(DataUpdateCoordinator[dict[str, ZoneStatus]]):
             )
             if zone_off_changed:
                 off_time_changed = True
+            await self._async_sync_trv_external_temperatures(zone)
 
             results[zone_id] = ZoneStatus(
                 zone_id=zone_id,
@@ -460,6 +465,31 @@ class ZealCoordinator(DataUpdateCoordinator[dict[str, ZoneStatus]]):
 
         _LOGGER.debug("Evaluation cycle complete")
         return results
+
+    async def _async_sync_trv_external_temperatures(
+        self, zone: dict[str, Any]
+    ) -> None:
+        """Give supported TRVs the same room reading used for demand."""
+        own_entities = self.own_thermostat_entity_ids()
+        for room in zone.get(ZONE_ROOMS, []):
+            if not room.get(ROOM_ACTIVE, True):
+                continue
+            trvs = [
+                trv
+                for trv in room.get(ROOM_TRVS, []) or []
+                if trv not in own_entities
+            ]
+            if not trvs:
+                continue
+            try:
+                await self.trv_external_temperature.async_sync_room(
+                    trvs, self._room_temperature(room)
+                )
+            except Exception:  # noqa: BLE001 - never block zone control
+                _LOGGER.exception(
+                    "[%s] Could not update TRV external temperature",
+                    room.get(ROOM_NAME, room.get(ROOM_ID)),
+                )
 
     def _evaluate_zone(self, zone: dict[str, Any]) -> tuple[bool, list[str]]:
         """Return (needs_heat, demand_lines) for one zone.

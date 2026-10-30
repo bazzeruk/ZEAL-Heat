@@ -145,6 +145,10 @@ MIN_TARGET_TEMPERATURE = 5.0
 MAX_TARGET_TEMPERATURE = 30.0
 OFFLINE_DEBOUNCE_SECONDS = 300
 STALE_THRESHOLD_SECONDS = 4 * 60 * 60
+# TRVs that accept an external room temperature (Sonoff TRVZB family through
+# Zigbee2MQTT) fall back to their own sensor when that input goes quiet, but
+# the timeout is undocumented. Resend an unchanged reading at this interval.
+TRV_EXTERNAL_TEMPERATURE_REFRESH_SECONDS = 30 * 60
 # A climate.set_temperature service call normally produces its matching state
 # event almost immediately. Keep that expected echo only briefly so an actual
 # manual turn to the same temperature later is never mistaken for our own write.

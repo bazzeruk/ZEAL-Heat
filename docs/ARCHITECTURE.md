@@ -35,6 +35,12 @@ other.
    configured physical TRVs, suppresses a room's demand while any configured
    window/door contact is open, evaluates remaining room demand and safely
    controls the zone actuator. Opening suppression never writes a setback.
+   TRVs that accept an external room reading (the Sonoff TRVZB family via
+   Zigbee2MQTT's `external_temperature_input` and `temperature_sensor_select`)
+   are fed the same room temperature used for demand, so their valves do not
+   close on a warmer radiator-side reading while the room still needs heat.
+   Without a usable room reading, and when ZEAL unloads, they return to their
+   built-in sensor. Other TRVs are unchanged.
    `binary_sensor.py` publishes that resolved room contribution as a recorded
    On/Off entity with its current reason, setpoint, temperature and open-contact
    context; zone-level actuator holds remain separate.
