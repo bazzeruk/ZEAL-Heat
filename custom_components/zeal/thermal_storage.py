@@ -5,6 +5,7 @@ from __future__ import annotations
 from collections.abc import Callable, Mapping
 from copy import deepcopy
 from datetime import datetime, timedelta, timezone
+import inspect
 from typing import TYPE_CHECKING, Any
 
 from .const import (
@@ -92,9 +93,17 @@ class ThermalStorage:
         if store_factory is None:
             from homeassistant.helpers.storage import Store
 
+            # Store gained serialize_in_event_loop after the pinned Home
+            # Assistant 2025.1 baseline; pass it only where it is accepted.
+            supports_serialize_option = (
+                "serialize_in_event_loop" in inspect.signature(Store).parameters
+            )
+
             def store_factory(
                 version: int, key: str, serialize_in_event_loop: bool
             ) -> Any:
+                if not supports_serialize_option:
+                    return Store[dict[str, object]](hass, version, key)
                 return Store[dict[str, object]](
                     hass,
                     version,

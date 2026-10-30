@@ -55,11 +55,19 @@ def test_python_workflow_runs_pinned_suite_and_compilation() -> None:
     workflow = (
         ROOT / ".github" / "workflows" / "tests.yml"
     ).read_text(encoding="utf-8")
-    requirements = (ROOT / "requirements_test.txt").read_text(encoding="utf-8")
     assert "push:" in workflow
     assert "pull_request:" in workflow
     assert "workflow_dispatch:" in workflow
     assert "python -m pytest tests/ -q" in workflow
-    assert "cache-dependency-path: requirements_test.txt" in workflow
+    assert "cache-dependency-path: ${{ matrix.requirements }}" in workflow
+    assert "python -m pip install -r ${{ matrix.requirements }}" in workflow
     assert "python -m compileall -q custom_components tests" in workflow
-    assert requirements.strip() == "pytest-homeassistant-custom-component==0.13.205"
+    for filename, pin in (
+        ("requirements_test.txt", "0.13.205"),
+        ("requirements_test_latest.txt", "0.13.316"),
+    ):
+        assert f"requirements: {filename}" in workflow
+        requirements = (ROOT / filename).read_text(encoding="utf-8")
+        assert requirements.strip() == (
+            f"pytest-homeassistant-custom-component=={pin}"
+        )
