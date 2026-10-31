@@ -6,7 +6,9 @@ time to click through by hand in a live development environment and runs in
 well under a second.
 
 The suite is pinned to `pytest-homeassistant-custom-component==0.13.205`, which
-provides Home Assistant `2025.1.4`. Test code is kept under `tests/`, not shipped
+provides Home Assistant `2025.1.4`. CI also runs the suite against Home
+Assistant `2026.2.3` on Python 3.13, pinned in `requirements_test_latest.txt`,
+so both older and current Home Assistant APIs stay covered. Test code is kept under `tests/`, not shipped
 inside `custom_components/zeal`. The exact collected count is intentionally not
 duplicated here; CI reports it from the current tree on every push and pull
 request.
