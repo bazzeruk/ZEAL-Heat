@@ -241,6 +241,7 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             await data["thermal_storage"].async_disable(delete_data=False)
             await data["schedule_runtime"].async_stop()
             data["coordinator"].async_teardown()
+            await data["coordinator"].trv_external_temperature.async_restore_local()
         if not hass.data[DOMAIN]:
             await async_remove_panel(hass)
         else:
